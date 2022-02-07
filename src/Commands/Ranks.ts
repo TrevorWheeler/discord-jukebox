@@ -33,6 +33,8 @@ export const Ranks: Command = {
       const rankName = rank ? rank.name : "N/A";
       content += username + ": " + rankName + "\n";
     }
+    content += "Cucky's Melbourne Lockdown: Ancient 5 \n";
+
     await interaction.followUp({
       ephemeral: true,
       content,
