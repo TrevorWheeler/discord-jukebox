@@ -1,0 +1,8 @@
+export enum UserSteamId {
+  LACHIE = "126716295",
+  JACKSON = "65400438",
+  BRENNAN = "137167282",
+  BRYCE = "34748841",
+  CROUCH = "107827782",
+  ADAM = "82441942",
+}
