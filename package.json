@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.15",
+    "@types/parse5": "^6.0.3",
     "@types/spotify-web-api-node": "^5.0.7",
     "nodemon": "^2.0.15",
     "ts-node": "^10.4.0",
