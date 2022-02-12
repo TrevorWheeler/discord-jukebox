@@ -8,8 +8,6 @@ export const Ranks: Command = {
   description: "Gamers DOTA ranks.",
   type: "CHAT_INPUT",
   run: async (client: Client, interaction: BaseCommandInteraction) => {
-    let content: string = "Doesnt look good.";
-
     for (const user in UserSteamId) {
       const steamId: UserSteamId =
         UserSteamId[user as keyof typeof UserSteamId];

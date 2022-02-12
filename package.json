@@ -4,6 +4,7 @@
   },
   "dependencies": {
     "@discordjs/rest": "^0.3.0",
+    "@discordjs/voice": "^0.8.0",
     "cheerio": "^1.0.0-rc.10",
     "discord-api-types": "^0.26.1",
     "discord.js": "^13.6.0",
