@@ -27,8 +27,8 @@ export const Hello: any = {
     if (channel) {
       try {
         const connection = await connectToChannel(channel);
-
-        // connection.subscribe(player);
+        const player = createAudioPlayer();
+        connection.subscribe(player);
         await message.reply("Hello!");
       } catch (error) {
         console.error(error);
