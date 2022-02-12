@@ -5,7 +5,7 @@ import {
   Interaction,
   Message,
 } from "discord.js";
-import Mic from "mic";
+const Mic = require("mic");
 import fs from "fs";
 const {
   NoSubscriberBehavior,
