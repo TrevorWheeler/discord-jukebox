@@ -9,10 +9,12 @@ import interactionCreate from "./listeners/interactionCreate";
 import messageCreate from "./listeners/messageCreate";
 
 import authenticateSpotify from "./Plugins/authenticateSpotify";
-
+import initChrome from "./Plugins/initChrome";
 app.use("/", spotifyRoute);
 // Needs work.
 // authenticateSpotify();
+
+const browser = null;
 
 const client = new Client({
   intents: [
@@ -21,9 +23,10 @@ const client = new Client({
     Intents.FLAGS.GUILD_VOICE_STATES,
   ],
 });
+
 ready(client);
 interactionCreate(client);
-messageCreate(client);
+messageCreate(client, browser);
 client.login(process.env.FILTHY_BOT_TOKEN);
 
 app.listen(process.env.PORT, () => {
