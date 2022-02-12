@@ -27,6 +27,6 @@ const handleMessage = async (
     return;
   }
 
-  const response = action.run(client, message);
+  const response = await action.run(client, message);
   message.reply(response ? response : ":(");
 };

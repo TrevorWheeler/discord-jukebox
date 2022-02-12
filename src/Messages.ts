@@ -1,3 +1,3 @@
-import { Hello } from "./Messages/Hello";
-
-export const Messages: any[] = [Hello];
+import { Bangers } from "./Messages/Bangers";
+import { Stop } from "./Messages/Stop";
+export const Messages: any[] = [Bangers, Stop];
