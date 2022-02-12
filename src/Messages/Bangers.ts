@@ -5,7 +5,8 @@ import {
   Interaction,
   Message,
 } from "discord.js";
-
+import Mic from "mic";
+import fs from "fs";
 const {
   NoSubscriberBehavior,
   createAudioPlayer,
@@ -34,18 +35,67 @@ export const Bangers: any = {
         adapterCreator: channel.guild.voiceAdapterCreator,
       });
       await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
-      // const player = createAudioPlayer({
-      //   behaviors: {
-      //     noSubscriber: NoSubscriberBehavior.Pause,
-      //   },
-      // });
 
-      // const resource = createAudioResource(
-      //   "https://live-radio01.mediahubaustralia.com/2TJW/mp3/"
-      // );
-      // player.play(resource);
+      var micInstance = Mic({
+        rate: "16000",
+        channels: "1",
+        debug: true,
+        exitOnSilence: 6,
+      });
+      var micInputStream = micInstance.getAudioStream();
 
-      // connection.subscribe(player);
+      micInputStream.on("data", function (data: any) {
+        console.log("Recieved Input Stream: " + data.length);
+      });
+
+      micInputStream.on("error", function (err: any) {
+        console.log("Error in Input Stream: " + err);
+      });
+
+      micInputStream.on("startComplete", function () {
+        console.log("Got SIGNAL startComplete");
+        setTimeout(function () {
+          micInstance.pause();
+        }, 5000);
+      });
+
+      micInputStream.on("stopComplete", function () {
+        console.log("Got SIGNAL stopComplete");
+      });
+
+      micInputStream.on("pauseComplete", function () {
+        console.log("Got SIGNAL pauseComplete");
+        setTimeout(function () {
+          micInstance.resume();
+        }, 5000);
+      });
+
+      micInputStream.on("resumeComplete", function () {
+        console.log("Got SIGNAL resumeComplete");
+        setTimeout(function () {
+          micInstance.stop();
+        }, 5000);
+      });
+
+      micInputStream.on("silence", function () {
+        console.log("Got SIGNAL silence");
+      });
+
+      micInputStream.on("processExitComplete", function () {
+        console.log("Got SIGNAL processExitComplete");
+      });
+
+      micInstance.start();
+      const player = createAudioPlayer({
+        behaviors: {
+          noSubscriber: NoSubscriberBehavior.Pause,
+        },
+      });
+
+      const resource = createAudioResource(micInputStream);
+      player.play(resource);
+
+      connection.subscribe(player);
       return ":)";
     } catch (error: any) {
       if (connection) {
