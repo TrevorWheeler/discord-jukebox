@@ -2,7 +2,7 @@ import { BaseCommandInteraction, Client } from "discord.js";
 import { Command } from "../Types/Command";
 export const Help: Command = {
   name: "help",
-  description: "Help with Filthy slash commands.",
+  description: "Help for Filthy Bot",
   type: "CHAT_INPUT",
   run: async (client: Client, interaction: BaseCommandInteraction) => {
     await interaction.followUp({
@@ -13,7 +13,6 @@ export const Help: Command = {
           author: {
             name: "Filthy",
           },
-
           fields: [
             {
               name: "/roll",
@@ -24,18 +23,18 @@ export const Help: Command = {
               value: "The Filthiest joke you ever heard.",
             },
             {
-              name: "/ranks",
-              value: "Gamers DOTA ranks.",
-            },
-            {
               name: "/stevesLatest",
               value: "Steves latest stealth video.",
             },
+            {
+              name: "-f radio",
+              value: "Joins and plays Triple J",
+            },
+            {
+              name: "-f stop",
+              value: "Leaves channel",
+            },
           ],
-          image: {
-            url: "https://cdn-japantimes.com/wp-content/uploads/2021/09/np_file_109890-scaled.jpeg",
-          },
-          timestamp: new Date(),
         },
       ],
     });

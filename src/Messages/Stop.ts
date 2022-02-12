@@ -6,19 +6,7 @@ import {
   Message,
 } from "discord.js";
 
-const {
-  NoSubscriberBehavior,
-  StreamType,
-  createAudioPlayer,
-  createAudioResource,
-  entersState,
-  AudioPlayerStatus,
-  VoiceConnectionStatus,
-  joinVoiceChannel,
-  voice,
-  getVoiceConnection,
-  generateDependencyReport,
-} = require("@discordjs/voice");
+const { getVoiceConnection } = require("@discordjs/voice");
 
 export const Stop: any = {
   name: "stop",
