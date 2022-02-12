@@ -34,6 +34,7 @@ export default async function authenticateSpotify() {
   });
   const authenticationResponse = await Spotify.clientCredentialsGrant();
   Spotify.setAccessToken(authenticationResponse.body.access_token);
+  process.env.SPOTIFY_ACCESS_TOKEN = authenticationResponse.body.access_token;
   const authorizeURL = Spotify.createAuthorizeURL(scopes, "state", showDialog);
   console.log(
     "Open link to enter spotify credentials and recieve callback: " +
@@ -53,7 +54,9 @@ export default async function authenticateSpotify() {
   await page.type("#login-password", process.env.SPOTIFY_PASSWORD);
 
   await page.click("#login-button");
-  page.waitForNavigation({ waitUntil: "networkidle2" });
+  await page.setDefaultNavigationTimeout(0);
+  await page.waitForNavigation();
+
   browser.close();
   return;
 }

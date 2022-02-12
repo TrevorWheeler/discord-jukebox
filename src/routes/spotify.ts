@@ -17,6 +17,8 @@ router.get("/callback", async (req: any, res: any) => {
 
     // Spotify is now authenticated and can interact with an active spotify device.
     console.log(Spotify.getCredentials());
+    process.env.SPOTIFY_TOKEN = authenticated.body["access_token"];
+    process.env.SPOTIFY_REFRESH_TOKEN = authenticated.body["refresh_token"];
 
     // const bangersAndClangers = await Spotify.getPlaylist(
     //   "6Lbd3XVZtsatcq3vuK9PkV"
