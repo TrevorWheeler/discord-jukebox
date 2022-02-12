@@ -36,7 +36,7 @@ export const Bangers: any = {
       });
       await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
 
-      var micInstance = Mic({
+      var micInstance: any = Mic({
         rate: "16000",
         channels: "1",
         debug: true,
