@@ -12,8 +12,6 @@ export const BangersAndClangers: Command = {
   description: "Joins channel and plays bangers",
   type: "CHAT_INPUT",
   run: async (client: Client, interaction: BaseCommandInteraction) => {
-    console.log(interaction);
-
     const content = "Sorry :(";
     await interaction.followUp({
       ephemeral: true,

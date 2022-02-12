@@ -1,3 +1,4 @@
+import { createDefaultAudioReceiveStreamOptions } from "@discordjs/voice";
 import {
   BaseCommandInteraction,
   Client,
@@ -26,9 +27,12 @@ export const Hello: any = {
     const channel = message.member?.voice.channel;
     if (channel) {
       try {
-        const connection = await connectToChannel(channel);
-        const player = createAudioPlayer();
-        connection.subscribe(player);
+        const connection = await connectToChannel(
+          message.member?.voice.channel
+        );
+
+        connection.playStream("http://stream01.iloveradio.de/iloveradio9.mp3");
+
         await message.reply("Hello!");
       } catch (error) {
         console.error(error);
@@ -55,53 +59,3 @@ async function connectToChannel(channel: any) {
     throw error;
   }
 }
-
-// const player = createAudioPlayer({
-//   behaviors: {
-//     noSubscriber: NoSubscriberBehavior.Play,
-//     maxMissedFrames: Math.round(config.maxTransmissionGap / 20),
-//   },
-// });
-
-// player.on("stateChange", (oldState, newState) => {
-//   if (
-//     oldState.status === AudioPlayerStatus.Idle &&
-//     newState.status === AudioPlayerStatus.Playing
-//   ) {
-//     console.log("Playing audio output on audio player");
-//   } else if (newState.status === AudioPlayerStatus.Idle) {
-//     console.log("Playback has stopped. Attempting to restart.");
-//     attachRecorder();
-//   }
-// });
-
-// function attachRecorder() {
-//   player.play(
-//     createAudioResource(
-//       new prism.FFmpeg({
-//         args: [
-//           "-analyzeduration",
-//           "0",
-//           "-loglevel",
-//           "0",
-//           "-f",
-//           config.type,
-//           "-i",
-//           config.type === "dshow" ? `audio=${config.device}` : config.device,
-//           "-acodec",
-//           "libopus",
-//           "-f",
-//           "opus",
-//           "-ar",
-//           "48000",
-//           "-ac",
-//           "2",
-//         ],
-//       }),
-//       {
-//         inputType: StreamType.OggOpus,
-//       }
-//     )
-//   );
-//   console.log("Attached recorder - ready to go!");
-// }
