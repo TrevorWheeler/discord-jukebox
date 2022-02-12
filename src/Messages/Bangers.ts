@@ -95,7 +95,7 @@ export const Bangers: any = {
         },
       });
 
-      const resource = createAudioResource(micInputStream);
+      const resource = createAudioResource(outputFileStream);
       player.play(resource);
 
       connection.subscribe(player);
