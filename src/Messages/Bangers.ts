@@ -36,13 +36,16 @@ export const Bangers: any = {
       });
       await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
 
-      var micInstance: any = Mic({
+      const micInstance: any = Mic({
         rate: "16000",
         channels: "1",
         debug: true,
         exitOnSilence: 6,
       });
-      var micInputStream = micInstance.getAudioStream();
+      const micInputStream = micInstance.getAudioStream();
+
+      const outputFileStream = fs.createWriteStream("/tmp/output.raw");
+      micInputStream.pipe(outputFileStream);
 
       // micInputStream.on("data", function (data: any) {
       //   console.log("Recieved Input Stream: " + data.length);
