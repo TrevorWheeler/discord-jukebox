@@ -1,11 +1,5 @@
 import { createDefaultAudioReceiveStreamOptions } from "@discordjs/voice";
-import {
-  BaseCommandInteraction,
-  Client,
-  Interaction,
-  Message,
-} from "discord.js";
-const Mic = require("mic");
+import { Client, Message } from "discord.js";
 import fs from "fs";
 const {
   NoSubscriberBehavior,
@@ -17,6 +11,7 @@ const {
   generateDependencyReport,
 } = require("@discordjs/voice");
 
+const AudioContext = require("web-audio-api");
 export const Bangers: any = {
   name: "bnc",
   description: "Plays Bangers",
@@ -28,77 +23,26 @@ export const Bangers: any = {
     console.log(generateDependencyReport());
     let connection: any;
     try {
-      const channel = message.member?.voice.channel;
-      connection = joinVoiceChannel({
-        channelId: channel.id,
-        guildId: channel.guild.id,
-        adapterCreator: channel.guild.voiceAdapterCreator,
-      });
-      await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
-
-      const micInstance: any = Mic({
-        rate: "16000",
-        channels: "1",
-        debug: true,
-        exitOnSilence: 6,
-      });
-      const micInputStream = micInstance.getAudioStream();
-
-      const outputFileStream = fs.createWriteStream("/tmp/output.raw");
-      micInputStream.pipe(outputFileStream);
-
-      // micInputStream.on("data", function (data: any) {
-      //   console.log("Recieved Input Stream: " + data.length);
+      // const channel = message.member?.voice.channel;
+      // connection = joinVoiceChannel({
+      //   channelId: channel.id,
+      //   guildId: channel.guild.id,
+      //   adapterCreator: channel.guild.voiceAdapterCreator,
       // });
+      // await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
 
-      // micInputStream.on("error", function (err: any) {
-      //   console.log("Error in Input Stream: " + err);
+      // const player = createAudioPlayer({
+      //   behaviors: {
+      //     noSubscriber: NoSubscriberBehavior.Pause,
+      //   },
       // });
+      // const context = new AudioContext();
 
-      // micInputStream.on("startComplete", function () {
-      //   console.log("Got SIGNAL startComplete");
-      //   setTimeout(function () {
-      //     micInstance.pause();
-      //   }, 5000);
-      // });
+      // context.outStream = process.stdout;
+      // const resource = createAudioResource(context.outStream);
+      // player.play(resource);
 
-      // micInputStream.on("stopComplete", function () {
-      //   console.log("Got SIGNAL stopComplete");
-      // });
-
-      // micInputStream.on("pauseComplete", function () {
-      //   console.log("Got SIGNAL pauseComplete");
-      //   setTimeout(function () {
-      //     micInstance.resume();
-      //   }, 5000);
-      // });
-
-      // micInputStream.on("resumeComplete", function () {
-      //   console.log("Got SIGNAL resumeComplete");
-      //   setTimeout(function () {
-      //     micInstance.stop();
-      //   }, 5000);
-      // });
-
-      // micInputStream.on("silence", function () {
-      //   console.log("Got SIGNAL silence");
-      // });
-
-      // micInputStream.on("processExitComplete", function () {
-      //   console.log("Got SIGNAL processExitComplete");
-      // });
-
-      micInstance.start();
-      const player = createAudioPlayer({
-        behaviors: {
-          noSubscriber: NoSubscriberBehavior.Pause,
-        },
-      });
-
-      const resource = createAudioResource(outputFileStream);
-      player.play(resource);
-
-      connection.subscribe(player);
+      // connection.subscribe(player);
       return ":)";
     } catch (error: any) {
       if (connection) {
