@@ -5,7 +5,8 @@ import {
   Interaction,
   Message,
 } from "discord.js";
-
+import { Browser, Page } from "puppeteer";
+const { getBrowserInstance } = require("../Plugins/puppeteer");
 const { getVoiceConnection } = require("@discordjs/voice");
 
 export const Stop: any = {
@@ -16,11 +17,22 @@ export const Stop: any = {
     if (!message.guild || !message.member || !message.member?.voice.channel) {
       return "Something went wrong. Mute me instead";
     }
+    const browser: Browser = await getBrowserInstance();
+    const pages = await browser.pages();
+    for (const page of pages) {
+      const isSpotify = await page.evaluate(() => {
+        return document.URL == "https://open.spotify.com/";
+      });
+      if (isSpotify) {
+        await page.close();
+      }
+    }
     const connection = getVoiceConnection(message.guild.id);
     if (!connection) {
-      return "I'm not in a voice channel!";
+      return;
     }
     connection.destroy();
-    return "Thanks for having me :)";
+
+    return;
   },
 };

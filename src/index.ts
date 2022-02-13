@@ -9,12 +9,11 @@ import interactionCreate from "./listeners/interactionCreate";
 import messageCreate from "./listeners/messageCreate";
 
 import authenticateSpotify from "./Plugins/authenticateSpotify";
-import initChrome from "./Plugins/initChrome";
-app.use("/", spotifyRoute);
-// Needs work.
-// authenticateSpotify();
+import { Browser, Puppeteer } from "puppeteer";
 
-const browser = null;
+app.use("/", spotifyRoute);
+authenticateSpotify();
+const browser: Browser | null = null;
 
 const client = new Client({
   intents: [
@@ -26,7 +25,7 @@ const client = new Client({
 
 ready(client);
 interactionCreate(client);
-messageCreate(client, browser);
+messageCreate(client);
 client.login(process.env.FILTHY_BOT_TOKEN);
 
 app.listen(process.env.PORT, () => {

@@ -17,9 +17,8 @@ export const Radio: any = {
   type: "REPLY",
   run: async (client: Client, message: Message) => {
     if (!message.guild || !message.member || !message.member?.voice.channel) {
-      return "nope";
+      return;
     }
-    // console.log(generateDependencyReport());
     let connection: any;
     try {
       const channel = message.member?.voice.channel;
@@ -34,19 +33,18 @@ export const Radio: any = {
           noSubscriber: NoSubscriberBehavior.Pause,
         },
       });
-
       const resource = createAudioResource(
         "https://live-radio01.mediahubaustralia.com/2TJW/mp3/"
       );
       player.play(resource);
 
       connection.subscribe(player);
-      return ":)";
+      return;
     } catch (error: any) {
       if (connection) {
         connection.destroy();
       }
-
+      console.log(error.message);
       return error.message;
     }
   },

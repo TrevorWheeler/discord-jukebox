@@ -20,5 +20,5 @@ const handleSlashCommand = async (
 
   await interaction.deferReply();
 
-  slashCommand.run(client, interaction, null);
+  slashCommand.run(client, interaction);
 };

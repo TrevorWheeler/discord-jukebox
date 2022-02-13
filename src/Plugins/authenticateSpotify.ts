@@ -43,20 +43,19 @@ export default async function authenticateSpotify() {
   if (!usePuppeteer) {
     return;
   }
-  const browser = await puppeteer.launch({ headless: true });
+
+  const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
-  await page
-    .goto(authorizeURL, {
-      waitUntil: "networkidle0",
-    })
-    .then(() => console.log("page is open"));
+  await page.goto(authorizeURL, {
+    waitUntil: "networkidle0",
+  });
   await page.type("#login-username", process.env.SPOTIFY_USERNAME);
   await page.type("#login-password", process.env.SPOTIFY_PASSWORD);
-
   await page.click("#login-button");
-  await page.setDefaultNavigationTimeout(0);
-  await page.waitForNavigation();
+  // await page.waitForNavigation();
+  // await page.setDefaultNavigationTimeout(2000);
+  await page.waitForTimeout(4000);
 
   browser.close();
-  return;
+  return Spotify;
 }

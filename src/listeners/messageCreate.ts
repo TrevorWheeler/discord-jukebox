@@ -1,20 +1,19 @@
 import { Client, Message } from "discord.js";
 import { Messages } from "../Messages";
 
-export default (client: Client, browser: any): void => {
+export default (client: Client): void => {
   client.on("messageCreate", async (message: Message) => {
     if (!message.content.startsWith("-f")) {
       return;
     }
 
-    await handleMessage(client, message, browser);
+    await handleMessage(client, message);
   });
 };
 
 const handleMessage = async (
   client: Client,
-  message: Message,
-  browser: any
+  message: Message
 ): Promise<void> => {
   if (message.content.length === 2) {
     message.reply(":)");
@@ -27,7 +26,5 @@ const handleMessage = async (
     message.reply("WTF?");
     return;
   }
-
-  const response = await action.run(client, message, browser);
-  message.reply(response ? response : ":(");
+  await action.run(client, message);
 };

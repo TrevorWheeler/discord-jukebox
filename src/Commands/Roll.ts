@@ -1,3 +1,12 @@
+import {
+  CreateVoiceConnectionOptions,
+  DiscordGatewayAdapterCreator,
+  entersState,
+  JoinConfig,
+  joinVoiceChannel,
+  VoiceConnection,
+  VoiceConnectionStatus,
+} from "@discordjs/voice";
 import { BaseCommandInteraction, Client } from "discord.js";
 import { Command } from "../Types/Command";
 
