@@ -1,17 +1,11 @@
+import { AudioPlayer, VoiceConnection } from "@discordjs/voice";
 import { Client, Message, MessageEmbed } from "discord.js";
-import { launch, getStream } from "puppeteer-stream";
-import { PlayerOptions } from "spotify-playback-sdk/dist/spotify";
-import SpotifyWebApi from "spotify-web-api-node";
-const {
-  NoSubscriberBehavior,
-  createAudioPlayer,
-  createAudioResource,
-  entersState,
-  VoiceConnectionStatus,
-  joinVoiceChannel,
-} = require("@discordjs/voice");
+import generateQueue from "../handlers/generateQueue";
+import playQueue from "../handlers/playQueue";
+import Channel from "../Plugins/channel";
+import Player from "../Plugins/player";
+import Spotify from "../Plugins/Spotify";
 
-const { getBrowserInstance } = require("../Plugins/puppeteer");
 export const Bangers: any = {
   name: "bnc",
   description: "Plays Bangers",
@@ -20,104 +14,33 @@ export const Bangers: any = {
     if (!message.guild || !message.member || !message.member?.voice.channel) {
       return "nope";
     }
-    let connection: any;
+    let channel: VoiceConnection | null = null;
     try {
-      const browser = await getBrowserInstance();
-      const page = await browser.newPage();
-
-      await page.goto("https://open.spotify.com", {
-        waitUntil: "networkidle0",
-        timeout: 0,
-      });
-
-      if (!process.env.SPOTIFY_PAGE_AUTHENTICATED) {
-        await page.waitForSelector(".jzic9t5dn38QUOYlDka0");
-
-        await page.click(".jzic9t5dn38QUOYlDka0");
-
-        await page.waitForSelector("#login-username");
-
-        await page.type(
-          "#login-username",
-          process.env.SPOTIFY_USERNAME ? process.env.SPOTIFY_USERNAME : ""
-        );
-        await page.type(
-          "#login-password",
-          process.env.SPOTIFY_PASSWORD ? process.env.SPOTIFY_PASSWORD : ""
-        );
-
-        await page.click("#login-button");
-
-        await page.waitForNavigation({
-          waitUntil: "networkidle0",
-        });
-
-        process.env.SPOTIFY_PAGE_AUTHENTICATED = "true";
-      } else {
-        await page.waitForTimeout(4000);
-      }
-
-      const Spotify = new SpotifyWebApi({
-        clientId: process.env.SPOTIFY_CLIENT_ID,
-        clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-      });
-
-      Spotify.setAccessToken(
-        process.env.SPOTIFY_TOKEN ? process.env.SPOTIFY_TOKEN : ""
-      );
-      Spotify.setRefreshToken(
-        process.env.SPOTIFY_REFRESH_TOKEN
-          ? process.env.SPOTIFY_REFRESH_TOKEN
-          : ""
-      );
-      const devices = await Spotify.getMyDevices();
-      let deviceId: string | null = devices.body.devices[0].id;
-      const bangersAndClangers = await Spotify.getPlaylist(
+      const spotify = await Spotify();
+      const spotifyPlaylist = await spotify.getPlaylistTracks(
         "6Lbd3XVZtsatcq3vuK9PkV"
       );
 
-      Spotify.play({
-        device_id: deviceId ? deviceId : "",
-        context_uri: bangersAndClangers.body.uri,
-      });
+      const playList = spotifyPlaylist.body.items;
+      await generateQueue(playList, false);
+      //open.spotify.com/playlist/2O3qN8dbM8IGpWcjm5KVde?si=fbae436d54824452
+      https: await playQueue();
 
-      const stream = await getStream(page, {
-        audio: true,
-        video: false,
-        bitsPerSecond: 320000,
-        frameSize: 20,
-      });
+      channel = await Channel(message.member.voice.channel, false);
+      const player: AudioPlayer | null = Player();
+      if (!player || !channel) {
+        throw new Error("Channel or audio player not initialised.");
+      }
 
-      const channel = message.member?.voice.channel;
-
-      connection = joinVoiceChannel({
-        channelId: channel.id,
-        guildId: channel.guild.id,
-        adapterCreator: channel.guild.voiceAdapterCreator,
-      });
-      await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
-
-      const player = createAudioPlayer({
-        behaviors: {
-          noSubscriber: NoSubscriberBehavior.Pause,
-        },
-      });
-
-      const resource = createAudioResource(stream);
-      player.play(resource);
-
-      connection.subscribe(player);
-
-      const reply = new MessageEmbed()
-        .setColor("#0099ff")
-        .setTitle(bangersAndClangers.body.name)
-        .setImage(bangersAndClangers.body.images[0].url);
-      await message.reply({ embeds: [reply] });
-
-      Spotify.setShuffle(true);
+      channel.subscribe(player);
+      // const reply = new MessageEmbed()
+      //   .setColor("#0099ff")
+      //   .setTitle(spotifyPlaylist.body.name)
+      //   .setImage(spotifyPlaylist.body.images[0].url);
+      // await message.reply({ embeds: [reply] });
     } catch (error: any) {
-      if (connection) {
-        connection.destroy();
+      if (channel) {
+        channel.destroy();
       }
       console.log(error.message);
     }

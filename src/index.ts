@@ -1,20 +1,12 @@
 require("dotenv").config();
-const express = require("express");
-const app = express();
-import spotifyRoute from "./routes/spotify";
-
 import { Client, Intents } from "discord.js";
 import ready from "./listeners/ready";
 import interactionCreate from "./listeners/interactionCreate";
 import messageCreate from "./listeners/messageCreate";
-
-import authenticateSpotify from "./Plugins/authenticateSpotify";
-import { Browser, Puppeteer } from "puppeteer";
-
-app.use("/", spotifyRoute);
-authenticateSpotify();
-const browser: Browser | null = null;
-
+var Queue = require("./db/schema/PlayQueue");
+import Spotify from "./Plugins/Spotify";
+import Player from "./Plugins/player";
+import playerListener from "./listeners/playerListener";
 const client = new Client({
   intents: [
     Intents.FLAGS.GUILDS,
@@ -23,13 +15,11 @@ const client = new Client({
   ],
 });
 
+const player = Player();
 ready(client);
 interactionCreate(client);
 messageCreate(client);
+playerListener(player);
 client.login(process.env.FILTHY_BOT_TOKEN);
 
-app.listen(process.env.PORT, () => {
-  console.log(
-    `Filthy Bot is live - ${process.env.SERVER}:${process.env.PORT}/login`
-  );
-});
+Spotify();

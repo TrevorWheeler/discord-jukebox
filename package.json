@@ -13,14 +13,15 @@
     "express": "^4.17.2",
     "ffmpeg-static": "^4.4.1",
     "install": "^0.13.0",
+    "mongoose": "^6.2.2",
     "node-fetch": "^2.6.7",
     "prism-media": "^1.3.2",
     "puppeteer": "^13.1.3",
-    "puppeteer-stream": "^2.0.9",
     "spotify-playback-sdk": "^1.0.4",
     "spotify-playback-sdk-node": "^1.0.2",
     "spotify-web-api-node": "^5.0.2",
-    "tweetnacl": "^1.0.3"
+    "tweetnacl": "^1.0.3",
+    "youtube-audio-stream": "^0.3.55"
   },
   "devDependencies": {
     "@types/node": "^17.0.15",

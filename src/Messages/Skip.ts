@@ -1,14 +1,6 @@
-import { createDefaultAudioReceiveStreamOptions } from "@discordjs/voice";
-import {
-  BaseCommandInteraction,
-  Client,
-  Interaction,
-  Message,
-} from "discord.js";
+import { Client, Message } from "discord.js";
 import { Browser, Page } from "puppeteer";
 import SpotifyWebApi from "spotify-web-api-node";
-const { getBrowserInstance } = require("../Plugins/puppeteer");
-const { getVoiceConnection } = require("@discordjs/voice");
 
 export const Skip: any = {
   name: "skip",
