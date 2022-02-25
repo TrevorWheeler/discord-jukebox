@@ -20,7 +20,6 @@ export default () => {
         noSubscriber: NoSubscriberBehavior.Pause,
       },
     });
-    console.log("set instance of player");
   }
   return instance;
 };

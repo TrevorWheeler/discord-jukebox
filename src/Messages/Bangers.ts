@@ -17,14 +17,13 @@ export const Bangers: any = {
     let channel: VoiceConnection | null = null;
     try {
       const spotify = await Spotify();
-      const spotifyPlaylist = await spotify.getPlaylistTracks(
+      const spotifyPlaylist= await spotify.getPlaylistTracks(
         "6Lbd3XVZtsatcq3vuK9PkV"
       );
 
       const playList = spotifyPlaylist.body.items;
       await generateQueue(playList, false);
-      //open.spotify.com/playlist/2O3qN8dbM8IGpWcjm5KVde?si=fbae436d54824452
-      https: await playQueue();
+      await playQueue();
 
       channel = await Channel(message.member.voice.channel, false);
       const player: AudioPlayer | null = Player();
@@ -33,11 +32,6 @@ export const Bangers: any = {
       }
 
       channel.subscribe(player);
-      // const reply = new MessageEmbed()
-      //   .setColor("#0099ff")
-      //   .setTitle(spotifyPlaylist.body.name)
-      //   .setImage(spotifyPlaylist.body.images[0].url);
-      // await message.reply({ embeds: [reply] });
     } catch (error: any) {
       if (channel) {
         channel.destroy();

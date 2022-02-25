@@ -26,10 +26,12 @@ const handleMessage = async (
   if (command.substring(0, 2) === "p ") {
     actionRequest = "play";
     message.content = command.substring(2);
-  } else if (command.substring(0, 4) === "stop") {
-    actionRequest = "stop";
   } else if (command.substring(0, 3) === "bnc") {
     actionRequest = "bnc";
+  }else if (command.substring(0, 4) === "stop") {
+    actionRequest = "stop";
+  }  else if (command.substring(0, 5) === "radio") {
+    actionRequest = "radio";
   }
 
   const action = Messages.find((c) => c.name === actionRequest);

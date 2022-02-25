@@ -15,29 +15,26 @@ export const Play: any = {
     if (!message.guild || !message.member || !message.member.voice.channel) {
       return;
     }
-    let connection: any;
+    let channel: VoiceConnection | null = null;
     try {
-      console.log(message.content);
-
       let playList: any[] = [];
-      let isYoutubeLink: string | false = youtubeParser(message.content);
+      let youtubeLinkId: string | false = youtubeParser(message.content);
       const isSpotifyLink: string[] | false = spotifyParser(message.content);
-      if (!isYoutubeLink && !isSpotifyLink) {
+      if (!youtubeLinkId && !isSpotifyLink) {
         const search = await fetch(
           "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=" +
             message.content +
             "&type=video&key=" +
             process.env.GOOGLE_API_KEY
         );
-        const result = await search.json();
-        isYoutubeLink = result.items[0].id.videoId;
+        const result: any = await search.json();
+        youtubeLinkId = result.items[0].id.videoId;
       } else if (isSpotifyLink) {
-        console.log(isSpotifyLink);
         const type = isSpotifyLink[0];
         switch (type) {
           case "playlist":
             const spotify = await Spotify();
-            const spotifyPlaylist = await spotify.getPlaylistTracks(
+            const spotifyPlaylist= await spotify.getPlaylistTracks(
               isSpotifyLink[1]
             );
             console.log(spotifyPlaylist);
@@ -49,10 +46,9 @@ export const Play: any = {
             break;
         }
       }
-
-      await generateQueue(playList, isYoutubeLink);
+      await generateQueue(playList, youtubeLinkId);
       const player: AudioPlayer | null = Player();
-      const channel: VoiceConnection | null = await Channel(
+      channel = await Channel(
         message.member.voice.channel,
         false
       );
@@ -67,11 +63,11 @@ export const Play: any = {
       message.react("👌");
       return;
     } catch (error: any) {
-      if (connection) {
-        connection.destroy();
+      if (channel) {
+        channel.destroy();
+        await Channel(null, true);
       }
       console.log(error.message);
-      return error.message;
     }
   },
 };
