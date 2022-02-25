@@ -45,7 +45,6 @@ export default async (channel: VoiceBasedChannel | null, destroy: boolean = fals
 
 
 
-
     } catch (error: any) {
         if (instance) {
             instance.destroy();
