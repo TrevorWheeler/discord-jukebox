@@ -7,7 +7,7 @@ export const Joke: Command = {
   type: "CHAT_INPUT",
   run: async (client: Client, interaction: BaseCommandInteraction) => {
     const jokeResponse = await fetch("https://api.jokes.one/jod");
-    const joke = await jokeResponse.json();
+    const joke: any = await jokeResponse.json();
     const content: string = joke.contents.jokes[0].joke.text;
     await interaction.followUp({
       ephemeral: true,
