@@ -15,7 +15,10 @@ const client = new Client({
   ],
 });
 
+
+
 const player = Player();
+
 ready(client);
 interactionCreate(client);
 messageCreate(client);

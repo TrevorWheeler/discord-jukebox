@@ -3,11 +3,6 @@ import { AudioPlayer, CreateAudioPlayerOptions } from "@discordjs/voice";
 const {
   NoSubscriberBehavior,
   createAudioPlayer,
-  createAudioResource,
-  entersState,
-  VoiceConnectionStatus,
-  joinVoiceChannel,
-  generateDependencyReport,
 } = require("@discordjs/voice");
 
 let instance: AudioPlayer | null = null;

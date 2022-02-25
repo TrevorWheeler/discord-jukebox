@@ -21,16 +21,17 @@ const handleMessage = async (
   }
 
   const command = message.content.substring(3);
-
   let actionRequest: string;
   if (command.substring(0, 2) === "p ") {
     actionRequest = "play";
     message.content = command.substring(2);
   } else if (command.substring(0, 3) === "bnc") {
     actionRequest = "bnc";
-  }else if (command.substring(0, 4) === "stop") {
+  } else if (command.substring(0, 4) === "stop") {
     actionRequest = "stop";
-  }  else if (command.substring(0, 5) === "radio") {
+  } else if (command.substring(0, 4) === "skip") {
+    actionRequest = "skip";
+  } else if (command.substring(0, 5) === "radio") {
     actionRequest = "radio";
   }
 

@@ -23,9 +23,9 @@ export const Play: any = {
       if (!youtubeLinkId && !isSpotifyLink) {
         const search = await fetch(
           "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=" +
-            message.content +
-            "&type=video&key=" +
-            process.env.GOOGLE_API_KEY
+          message.content +
+          "&type=video&key=" +
+          process.env.GOOGLE_API_KEY
         );
         const result: any = await search.json();
         youtubeLinkId = result.items[0].id.videoId;
@@ -34,7 +34,7 @@ export const Play: any = {
         switch (type) {
           case "playlist":
             const spotify = await Spotify();
-            const spotifyPlaylist= await spotify.getPlaylistTracks(
+            const spotifyPlaylist = await spotify.getPlaylistTracks(
               isSpotifyLink[1]
             );
             console.log(spotifyPlaylist);
@@ -49,8 +49,7 @@ export const Play: any = {
       await generateQueue(playList, youtubeLinkId);
       const player: AudioPlayer | null = Player();
       channel = await Channel(
-        message.member.voice.channel,
-        false
+        message.member.voice.channel
       );
       if (!player || !channel) {
         throw new Error("Channel or audio player not initialised.");
@@ -58,13 +57,13 @@ export const Play: any = {
       if (player.state.status === "playing") {
         return;
       }
-      await playQueue().then();
+      await playQueue();
       channel.subscribe(player);
+
       message.react("👌");
       return;
     } catch (error: any) {
       if (channel) {
-        channel.destroy();
         await Channel(null, true);
       }
       console.log(error.message);
@@ -85,3 +84,6 @@ function spotifyParser(str: string): string[] | false {
   const match = str.match(regEx);
   return match ? [match[1], match[2]] : false;
 }
+
+
+

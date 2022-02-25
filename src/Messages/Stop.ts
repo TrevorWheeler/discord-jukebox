@@ -1,8 +1,6 @@
-import { createDefaultAudioReceiveStreamOptions } from "@discordjs/voice";
+
 import {
-  BaseCommandInteraction,
   Client,
-  Interaction,
   Message,
 } from "discord.js";
 var Queue = require("../db/schema/PlayQueue");
@@ -16,13 +14,8 @@ export const Stop: any = {
       return "Something went wrong. Mute me instead";
     }
     await Queue.deleteMany({});
-    const channel = await Channel(null, false);
-    if (!channel) {
-      return;
-    }
-    channel.destroy();
+
     await Channel(null, true);
-    console.log(channel);
     return;
   },
 };

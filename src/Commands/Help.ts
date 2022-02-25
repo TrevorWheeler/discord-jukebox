@@ -24,15 +24,19 @@ export const Help: Command = {
             },
             {
               name: "/stevesLatest",
-              value: "Steves latest stealth video.",
+              value: "Posts Steves latest stealth video.",
             },
             {
               name: "-f radio",
-              value: "Joins and plays Triple J",
+              value: "Joins channel and plays Triple J",
+            },
+            {
+              name: "-f p ${query}",
+              value: "Attempts to play the searched query. If player is active the queried result will be added to player queue.",
             },
             {
               name: "-f stop",
-              value: "Leaves channel",
+              value: "Deletes queue and Leaves channel.",
             },
           ],
         },

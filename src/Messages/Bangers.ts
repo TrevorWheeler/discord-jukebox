@@ -17,7 +17,7 @@ export const Bangers: any = {
     let channel: VoiceConnection | null = null;
     try {
       const spotify = await Spotify();
-      const spotifyPlaylist= await spotify.getPlaylistTracks(
+      const spotifyPlaylist = await spotify.getPlaylistTracks(
         "6Lbd3XVZtsatcq3vuK9PkV"
       );
 
