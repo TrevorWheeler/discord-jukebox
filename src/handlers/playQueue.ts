@@ -2,7 +2,7 @@ import { AudioPlayer, createAudioResource } from "@discordjs/voice";
 import fetch from "node-fetch";
 import Player from "../Plugins/player";
 import stream from "youtube-audio-stream";
-import Channel from 'src/Plugins/channel';
+import Channel from '../Plugins/channel';
 var Queue = require("../db/schema/PlayQueue");
 export default async () => {
   const player: AudioPlayer | null = Player();

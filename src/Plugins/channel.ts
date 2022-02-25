@@ -16,10 +16,10 @@ let instance: VoiceConnection | null = null;
 export default async (channel: VoiceBasedChannel | null, destroy: boolean = false) => {
     try {
         if (!channel && destroy) {
-            if (!instance) {
-                return;
+            if (instance) {
+                instance.destroy();
             }
-            instance.destroy();
+
             instance = null;
         }
         if (!instance && channel) {
