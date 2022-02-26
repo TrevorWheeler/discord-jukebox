@@ -6,6 +6,5 @@ export const Skip: any = {
   type: "REPLY",
   run: async (client: Client, message: Message) => {
     await JukeBox.skip();
-
   },
 };

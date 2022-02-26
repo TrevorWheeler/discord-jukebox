@@ -3,6 +3,7 @@ import { AudioPlayer, createAudioPlayer, createAudioResource, entersState, joinV
 import fetch from "node-fetch";
 import stream from "youtube-audio-stream";
 import { VoiceBasedChannel } from 'discord.js';
+import Track from 'Types/Track';
 var Queue = require("../db/schema/PlayQueue");
 const Database = require("../db/index");
 
@@ -45,6 +46,7 @@ class JukeBox implements IJukeBox {
     }
     async enterChannel(config: VoiceBasedChannel) {
         try {
+
             this.channel = joinVoiceChannel({
                 channelId: config.id,
                 guildId: config.guild.id,
@@ -77,9 +79,13 @@ class JukeBox implements IJukeBox {
     }
     async destroyChannel() {
         try {
+            await Queue.deleteMany({});
+            this.player.stop();
             if (!this.channel) {
                 throw new Error("No channel to destroy.");
             }
+
+
             this.channel.destroy();
         } catch (error: any) {
             console.error(error.message);
@@ -88,6 +94,10 @@ class JukeBox implements IJukeBox {
 
     get playerActive() {
         return this.player.state.status === "playing";
+    }
+
+    get channelInactive() {
+        return !this.channel || this.channel.state.status === "destroyed";
     }
 
     public async play() {
@@ -103,7 +113,6 @@ class JukeBox implements IJukeBox {
                 "&type=video&key=" +
                 process.env.GOOGLE_API_KEY
             );
-
             const response = await search.json();
             const videoId = response.items[0].id.videoId;
             const url: string = "https://www.youtube.com/watch?v=" + videoId;
@@ -117,18 +126,16 @@ class JukeBox implements IJukeBox {
         }
     }
 
-    public async addToPlayerQueue(playList: any[], youtubeLinkId: String | false = false) {
+    public async addToPlayerQueue(queue: Track[], youtubeLinkId: String | false = false) {
         try {
             await Database.connect();
             if (!youtubeLinkId) {
-                for (const music of playList) {
-                    const track = music.track;
-                    const album = track.album.name;
-                    let artists = "";
-                    for (const artist of track.artists) {
-                        artists += artist.name + " ";
-                    }
-                    const searchQuery = album + " " + artists + track.name;
+                for (const track of queue) {
+
+                    const artists = track.artists.map((x: SpotifyApi.ArtistObjectSimplified) => x.name);
+
+                    // TODO: if a track name is also the name of the album we should remove the album from the search query.
+                    const searchQuery = artists.join(" ") + " " + track.name;
                     const song = {
                         searchQuery: searchQuery,
                     };
@@ -149,7 +156,8 @@ class JukeBox implements IJukeBox {
 
     public async skip() {
         try {
-            await Queue.deleteOne({});
+            this.player.stop();
+            await Queue.findOneAndRemove();
             this.play();
         } catch (error: any) {
             console.error(error.message);

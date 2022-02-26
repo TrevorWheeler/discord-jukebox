@@ -1,4 +1,3 @@
-import { createDefaultAudioReceiveStreamOptions } from "@discordjs/voice";
 import { Client, Message } from "discord.js";
 
 const {
@@ -8,12 +7,11 @@ const {
   entersState,
   VoiceConnectionStatus,
   joinVoiceChannel,
-  generateDependencyReport,
 } = require("@discordjs/voice");
 
 export const Radio: any = {
   name: "radio",
-  description: "Returns a response from Filthy himself.",
+  description: "Plays JJJ.",
   type: "REPLY",
   run: async (client: Client, message: Message) => {
     if (!message.guild || !message.member || !message.member?.voice.channel) {

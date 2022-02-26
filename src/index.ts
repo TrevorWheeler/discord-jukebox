@@ -17,5 +17,4 @@ ready(client);
 interactionCreate(client);
 messageCreate(client);
 client.login(process.env.FILTHY_BOT_TOKEN);
-
 Spotify();
