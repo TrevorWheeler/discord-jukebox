@@ -1,12 +1,7 @@
-import { AudioPlayer, VoiceConnection } from "@discordjs/voice";
 import { Client, Message } from "discord.js";
-import Player from "../Plugins/player";
-import generateQueue from "../handlers/generateQueue";
-import Channel from "../Plugins/channel";
 import fetch from "node-fetch";
-import playQueue from "../handlers/playQueue";
 import Spotify from "../Plugins/Spotify";
-
+import JukeBox from "../Plugins/JukeBox";
 export const Play: any = {
   name: "play",
   description: "Plays song.",
@@ -15,7 +10,6 @@ export const Play: any = {
     if (!message.guild || !message.member || !message.member.voice.channel) {
       return;
     }
-    let channel: VoiceConnection | null = null;
     try {
       let playList: any[] = [];
       let youtubeLinkId: string | false = youtubeParser(message.content);
@@ -46,26 +40,15 @@ export const Play: any = {
             break;
         }
       }
-      await generateQueue(playList, youtubeLinkId);
-      const player: AudioPlayer | null = Player();
-      channel = await Channel(
-        message.member.voice.channel
-      );
-      if (!player || !channel) {
-        throw new Error("Channel or audio player not initialised.");
+      await JukeBox.addToPlayerQueue(playList, youtubeLinkId);
+
+      if (!JukeBox.channel || JukeBox.channel.state.status === "destroyed") {
+        JukeBox.enterChannel(message.member.voice.channel);
       }
-      if (player.state.status === "playing") {
-        return;
-      }
-      await playQueue();
-      channel.subscribe(player);
 
       message.react("👌");
       return;
     } catch (error: any) {
-      if (channel) {
-        await Channel(null, true);
-      }
       console.log(error.message);
     }
   },

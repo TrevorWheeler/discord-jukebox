@@ -3,8 +3,8 @@ import {
   Client,
   Message,
 } from "discord.js";
+import JukeBox from '../Plugins/JukeBox';
 var Queue = require("../db/schema/PlayQueue");
-import Channel from "../Plugins/channel";
 export const Stop: any = {
   name: "stop",
   description: "Stops and removes play queue.",
@@ -15,7 +15,7 @@ export const Stop: any = {
     }
     await Queue.deleteMany({});
 
-    await Channel(null, true);
+    JukeBox.destroyChannel();
     return;
   },
 };
