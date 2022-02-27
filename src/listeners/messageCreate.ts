@@ -1,12 +1,12 @@
 import { Client, Message } from "discord.js";
-import { Messages } from "../Messages";
+import { Messages } from '../Messages';
 
 export default (client: Client): void => {
   client.on("messageCreate", async (message: Message) => {
-    if (!message.content.startsWith("-f")) {
+    const command: string | undefined = process.env.NODE_ENV !== 'development' ? process.env.BOT_COMMAND : process.env.BOT_COMMAND_DEV;
+    if (!message.content.startsWith(command ? command : "-f")) {
       return;
     }
-
     await handleMessage(client, message);
   });
 };
@@ -31,12 +31,12 @@ const handleMessage = async (
     actionRequest = "stop";
   } else if (command.substring(0, 4) === "skip") {
     actionRequest = "skip";
-  } else if (command.substring(0, 5) === "radio") {
-    actionRequest = "radio";
+  } else if (command.substring(0, 4) === "show") {
+    actionRequest = "show";
+    message.content = command.substring(5);
   }
 
   const action = Messages.find((c) => c.name === actionRequest);
-
   if (!action) {
     message.reply("WTF?");
     return;

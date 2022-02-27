@@ -8,8 +8,11 @@ export default async () => {
     });
 
     const authentication = await Spotify.clientCredentialsGrant();
-    process.env.SPOTIFY_ACCESS_TOKEN = authentication.body.access_token;
-    Spotify.setAccessToken(process.env.SPOTIFY_ACCESS_TOKEN);
+    // process.env.SPOTIFY_ACCESS_TOKEN = authentication.body.access_token;
+    Spotify.setAccessToken(authentication.body.access_token);
   }
   return Spotify;
 };
+
+
+

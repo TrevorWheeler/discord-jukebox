@@ -5,6 +5,7 @@ import interactionCreate from "./listeners/interactionCreate";
 import messageCreate from "./listeners/messageCreate";
 import Spotify from "./Plugins/Spotify";
 
+
 const client = new Client({
   intents: [
     Intents.FLAGS.GUILDS,
@@ -16,5 +17,5 @@ const client = new Client({
 ready(client);
 interactionCreate(client);
 messageCreate(client);
-client.login(process.env.FILTHY_BOT_TOKEN);
+client.login(process.env.NODE_ENV !== 'development' ? process.env.FILTHY_BOT_TOKEN : process.env.FILTHY_BOT_TOKEN_DEV);
 Spotify();

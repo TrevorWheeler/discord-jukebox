@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import Spotify from "../Plugins/Spotify";
 import JukeBox from "../Plugins/JukeBox";
 import Track from 'Types/Track';
+import ChannelConfig from '../Types/ChannelConfig';
 export const Play: any = {
   name: "play",
   description: "Plays song.",
@@ -72,7 +73,12 @@ export const Play: any = {
       await JukeBox.addToPlayerQueue(queue, youtubeLinkId);
 
       if (JukeBox.channelInactive) {
-        JukeBox.enterChannel(message.member.voice.channel);
+        const channelConfig: ChannelConfig = {
+          guildId: message.member.voice.channel.guild.id,
+          channelId: message.member.voice.channel.id,
+          adapterCreator: message.member.voice.channel.guild.voiceAdapterCreator
+        };
+        JukeBox.enterChannel(channelConfig);
       }
       message.react("👌");
     } catch (error: any) {

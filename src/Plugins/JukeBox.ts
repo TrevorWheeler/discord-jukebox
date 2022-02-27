@@ -1,9 +1,9 @@
 import { AudioPlayer, createAudioPlayer, createAudioResource, entersState, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
-
 import fetch from "node-fetch";
 import stream from "youtube-audio-stream";
 import { VoiceBasedChannel } from 'discord.js';
 import Track from 'Types/Track';
+import ChannelConfig from 'Types/ChannelConfig';
 var Queue = require("../db/schema/PlayQueue");
 const Database = require("../db/index");
 
@@ -44,14 +44,22 @@ class JukeBox implements IJukeBox {
             }
         });
     }
-    async enterChannel(config: VoiceBasedChannel) {
+    get playerActive() {
+        return this.player.state.status === "playing";
+    }
+
+    get channelInactive() {
+        return !this.channel || this.channel.state.status === "destroyed";
+    }
+    async enterChannel(config: ChannelConfig) {
         try {
 
-            this.channel = joinVoiceChannel({
-                channelId: config.id,
-                guildId: config.guild.id,
-                adapterCreator: config.guild.voiceAdapterCreator,
-            });
+            // const guildId = interaction.guild?.id ?? "";
+            // const adapterCreator = interaction.guild?.voiceAdapterCreator!;
+            // const channelId = (interaction.member as GuildMember).voice.channel?.id!;
+            // const channel = joinVoiceChannel({ channelId, guildId, adapterCreator });
+
+            this.channel = joinVoiceChannel(config);
             if (!this.channel) {
                 throw new Error("Channel failed to initialise.");
             }
@@ -84,21 +92,37 @@ class JukeBox implements IJukeBox {
             if (!this.channel) {
                 throw new Error("No channel to destroy.");
             }
-
-
             this.channel.destroy();
         } catch (error: any) {
             console.error(error.message);
         }
     }
 
-    get playerActive() {
-        return this.player.state.status === "playing";
+    public async addToPlayerQueue(queue: Track[], youtubeLinkId: String | false = false) {
+        try {
+            await Database.connect();
+            if (!youtubeLinkId) {
+                for (const track of queue) {
+                    const artists = track.artists.map((x: SpotifyApi.ArtistObjectSimplified) => x.name);
+                    const searchQuery = artists.join(" ") + " " + track.name + (!track.album.includes(track.name) ? (" " + track.album) : "");
+                    const song = {
+                        searchQuery: searchQuery,
+                    };
+                    const doc = new Queue(song);
+                    await doc.save();
+                }
+            } else {
+                const song = {
+                    searchQuery: youtubeLinkId,
+                };
+                const doc = new Queue(song);
+                await doc.save();
+            }
+        } catch (error: any) {
+            console.error(error.message);
+        }
     }
 
-    get channelInactive() {
-        return !this.channel || this.channel.state.status === "destroyed";
-    }
 
     public async play() {
         try {
@@ -121,34 +145,6 @@ class JukeBox implements IJukeBox {
                     id: song._id.toString(),
                 },
             }));
-        } catch (error: any) {
-            console.error(error.message);
-        }
-    }
-
-    public async addToPlayerQueue(queue: Track[], youtubeLinkId: String | false = false) {
-        try {
-            await Database.connect();
-            if (!youtubeLinkId) {
-                for (const track of queue) {
-
-                    const artists = track.artists.map((x: SpotifyApi.ArtistObjectSimplified) => x.name);
-
-                    // TODO: if a track name is also the name of the album we should remove the album from the search query.
-                    const searchQuery = artists.join(" ") + " " + track.name;
-                    const song = {
-                        searchQuery: searchQuery,
-                    };
-                    const doc = new Queue(song);
-                    await doc.save();
-                }
-            } else {
-                const song = {
-                    searchQuery: youtubeLinkId,
-                };
-                const doc = new Queue(song);
-                await doc.save();
-            }
         } catch (error: any) {
             console.error(error.message);
         }

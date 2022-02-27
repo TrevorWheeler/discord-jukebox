@@ -19,31 +19,3 @@ declare module "puppeteer" {
     getStream(opts: getStreamOptions): Promise<Stream>;
   }
 }
-export declare function launch(
-  opts: LaunchOptions & BrowserLaunchArgumentOptions & BrowserConnectOptions
-): Promise<Browser>;
-export declare type BrowserMimeType =
-  | "audio/webm"
-  | "audio/webm;codecs=opus"
-  | "audio/opus"
-  | "audio/aac"
-  | "audio/ogg"
-  | "audio/mp3"
-  | "audio/pcm"
-  | "audio/wav"
-  | "audio/vorbis"
-  | "video/webm"
-  | "video/mp4";
-export interface getStreamOptions {
-  audio: boolean;
-  video: boolean;
-  mimeType?: BrowserMimeType;
-  audioBitsPerSecond?: number;
-  videoBitsPerSecond?: number;
-  bitsPerSecond?: number;
-  frameSize?: number;
-}
-export declare function getStream(
-  page: Page,
-  opts: getStreamOptions
-): Promise<Stream>;

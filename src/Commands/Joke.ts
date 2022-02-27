@@ -1,7 +1,7 @@
 import { BaseCommandInteraction, Client } from "discord.js";
 import { Command } from "../Types/Command";
 import fetch from "node-fetch";
-export const Joke: Command = {
+export const Joke: any = {
   name: "joke",
   description: "The Filthiest joke you ever heard.",
   type: "CHAT_INPUT",

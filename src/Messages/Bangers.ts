@@ -1,4 +1,5 @@
 import { Client, Message } from "discord.js";
+import ChannelConfig from '../Types/ChannelConfig';
 import Track from 'Types/Track';
 import JukeBox from '../Plugins/JukeBox';
 import Spotify from "../Plugins/Spotify";
@@ -26,7 +27,19 @@ export const Bangers: any = {
         };
       });
       await JukeBox.addToPlayerQueue(queue);
-      JukeBox.enterChannel(message.member.voice.channel);
+
+
+      if (JukeBox.channelInactive) {
+        const channelConfig: ChannelConfig = {
+          guildId: message.member.voice.channel.guild.id,
+          channelId: message.member.voice.channel.id,
+          adapterCreator: message.member.voice.channel.guild.voiceAdapterCreator
+        };
+        JukeBox.enterChannel(channelConfig);
+      }
+
+
+
     } catch (error: any) {
       console.log(error.message);
     }
