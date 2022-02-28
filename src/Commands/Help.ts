@@ -10,23 +10,10 @@ export const Help: CommandInteraction = {
       embeds: [
         {
           color: 0x0099ff,
-          title: "Slash Commands",
           author: {
-            name: "Filthy",
+            name: "Filthy Bot commands",
           },
           fields: [
-            {
-              name: "/roll",
-              value: "Random roll between 0 - 100",
-            },
-            {
-              name: "/joke",
-              value: "The Filthiest joke you ever heard.",
-            },
-            {
-              name: "/stevesLatest",
-              value: "Posts Steves latest stealth video.",
-            },
             {
               name: "-f p ${query}",
               value: "Attempts to play the searched query. If player is active the queried result will be added to player queue.",
@@ -41,7 +28,19 @@ export const Help: CommandInteraction = {
             },
             {
               name: "-f stop",
-              value: "Deletes queue and Leaves channel.",
+              value: "Deletes queue and leaves channel.",
+            },
+            {
+              name: "/roll",
+              value: "Random roll between 0 - 100",
+            },
+            {
+              name: "/joke",
+              value: "The Filthiest joke you ever heard.",
+            },
+            {
+              name: "/stevesLatest",
+              value: "Posts Steves latest stealth video.",
             },
 
           ],
