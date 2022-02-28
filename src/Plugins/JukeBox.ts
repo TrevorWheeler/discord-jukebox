@@ -1,10 +1,12 @@
 import { AudioPlayer, createAudioPlayer, createAudioResource, entersState, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import fetch from "node-fetch";
 import stream from "youtube-audio-stream";
-import { VoiceBasedChannel } from 'discord.js';
-import Track from 'Types/Track';
-import ChannelConfig from 'Types/ChannelConfig';
+import Track from '../Types/Track';
+import ChannelConfig from '../Types/ChannelConfig';
+import Spotify from "../Plugins/Spotify";
 var Queue = require("../db/schema/PlayQueue");
+
+
 const Database = require("../db/index");
 
 interface IJukeBox {
@@ -53,12 +55,6 @@ class JukeBox implements IJukeBox {
     }
     async enterChannel(config: ChannelConfig) {
         try {
-
-            // const guildId = interaction.guild?.id ?? "";
-            // const adapterCreator = interaction.guild?.voiceAdapterCreator!;
-            // const channelId = (interaction.member as GuildMember).voice.channel?.id!;
-            // const channel = joinVoiceChannel({ channelId, guildId, adapterCreator });
-
             this.channel = joinVoiceChannel(config);
             if (!this.channel) {
                 throw new Error("Channel failed to initialise.");
@@ -98,22 +94,14 @@ class JukeBox implements IJukeBox {
         }
     }
 
-    public async addToPlayerQueue(queue: Track[], youtubeLinkId: String | false = false) {
+    public async addToPlayerQueue(queue: Track[]) {
         try {
             await Database.connect();
-            if (!youtubeLinkId) {
-                for (const track of queue) {
-                    const artists = track.artists.map((x: SpotifyApi.ArtistObjectSimplified) => x.name);
-                    const searchQuery = artists.join(" ") + " " + track.name + (!track.album.includes(track.name) ? (" " + track.album) : "");
-                    const song = {
-                        searchQuery: searchQuery,
-                    };
-                    const doc = new Queue(song);
-                    await doc.save();
-                }
-            } else {
+            for (const track of queue) {
+                const artists = track.artists.map((x: SpotifyApi.ArtistObjectSimplified) => x.name);
+                const searchQuery = artists.join(" ") + " " + track.name + (!track.album.includes(track.name) ? (" " + track.album) : "");
                 const song = {
-                    searchQuery: youtubeLinkId,
+                    searchQuery: searchQuery.trim(),
                 };
                 const doc = new Queue(song);
                 await doc.save();
@@ -159,9 +147,117 @@ class JukeBox implements IJukeBox {
             console.error(error.message);
         }
     }
+
+
+    public async getPlayerQueue(query: string, isShow: boolean = false): Promise<Track[]> {
+        const queue: Track[] = [];
+        const isSpotifyLink: string[] | false = spotifyParser(query);
+        let youtubeLinkId: string | false = youtubeParser(query);
+        if (!youtubeLinkId && !isSpotifyLink) {
+            const search = await fetch(
+                "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=" +
+                query +
+                "&type=video&key=" +
+                process.env.GOOGLE_API_KEY
+            );
+            const result: any = await search.json();
+
+
+
+            if (!isShow) {
+                youtubeLinkId = result.items[0].id.videoId;
+                if (!youtubeLinkId) {
+                    return [];
+                }
+
+                queue.push(...[{
+                    name: youtubeLinkId,
+                    album: "",
+                    artists: [],
+                    youtubeTitle: result.items[0].snippet.title
+                }]);
+            } else {
+
+                for (const item of result.items) {
+                    youtubeLinkId = item.id.videoId;
+                    if (!youtubeLinkId) {
+                        return [];
+                    }
+                    queue.push({
+                        name: youtubeLinkId,
+                        album: "",
+                        artists: [],
+                        youtubeTitle: item.snippet.title
+                    });
+                }
+            }
+
+
+        } else if (isSpotifyLink) {
+            const [spotifyRequestType, id]: string[] = isSpotifyLink;
+            const spotify = await Spotify();
+            switch (spotifyRequestType) {
+                case "playlist":
+                    const playlist = await spotify.getPlaylistTracks(
+                        id
+                    );
+                    const playlistTracks: SpotifyApi.PlaylistTrackObject[] = playlist.body.items;
+
+                    queue.push(...playlistTracks.map((x: SpotifyApi.PlaylistTrackObject) => {
+                        const artists = x.track.artists.map((x: SpotifyApi.ArtistObjectSimplified) => x.name);
+                        return {
+                            name: x.track.name,
+                            album: x.track.album.name,
+                            artists: x.track.artists,
+                            youtubeTitle: x.track.name + " - " + artists.join(" ")
+                        };
+                    }));
+                    break;
+                case "track":
+                    const track = await spotify.getTrack(
+                        id
+                    );
+                    const artists = track.body.artists.map((x: SpotifyApi.ArtistObjectSimplified) => x.name);
+                    queue.push(...[{
+                        name: track.body.name,
+                        album: track.body.album.name,
+                        artists: track.body.artists,
+                        youtubeTitle: track.body.name + " - " + artists.join(" ")
+                    }]);
+                    break;
+                case "album":
+                    const album = await spotify.getAlbum(
+                        id
+                    );
+                    const albumTracks: SpotifyApi.TrackObjectSimplified[] = album.body.tracks.items;
+                    queue.push(...albumTracks.map((x: SpotifyApi.TrackObjectSimplified) => {
+                        const artists = x.artists.map((x: SpotifyApi.ArtistObjectSimplified) => x.name);
+                        return {
+                            name: x.name,
+                            album: album.body.name,
+                            artists: x.artists,
+                            youtubeTitle: x.name + " - " + artists.join(" ")
+                        };
+                    }));
+                    break;
+            }
+        }
+        return queue;
+    }
 }
 
 
 export default new JukeBox();
+
+function youtubeParser(url: string): string | false {
+    const match = url.match(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/);
+    return match && match[7].length === 11 ? match[7] : false;
+}
+
+function spotifyParser(str: string): string[] | false {
+    const match = str.match(/^(?:spotify:|(?:https?:\/\/(?:open|play)\.spotify\.com\/))(?:embed)?\/?(album|track|playlist)(?::|\/)((?:[0-9a-zA-Z]){22})/);
+    return match ? [match[1], match[2]] : false;
+}
+
 
 

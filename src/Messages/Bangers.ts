@@ -3,11 +3,11 @@ import ChannelConfig from '../Types/ChannelConfig';
 import Track from 'Types/Track';
 import JukeBox from '../Plugins/JukeBox';
 import Spotify from "../Plugins/Spotify";
-
-export const Bangers: any = {
+import { MessageInteraction } from '../Types/MessageInteraction';
+export const Bangers: MessageInteraction = {
   name: "bnc",
   description: "Plays Bangers",
-  type: "REPLY",
+  type: "MESSAGE",
   run: async (client: Client, message: Message) => {
     if (!message.guild || !message.member || !message.member?.voice.channel) {
       return "nope";

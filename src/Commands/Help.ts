@@ -1,10 +1,11 @@
-import { BaseCommandInteraction, Client } from "discord.js";
-import { Command } from "../Types/Command";
-export const Help: Command = {
+import { BaseCommandInteraction, Client, Message } from "discord.js";
+import { CommandInteraction } from "../Types/CommandInteraction";
+export const Help: CommandInteraction = {
   name: "help",
   description: "Help for Filthy Bot",
   type: "CHAT_INPUT",
-  run: async (client: Client, interaction: BaseCommandInteraction) => {
+  run: async (client: Client, interaction: BaseCommandInteraction | Message) => {
+    interaction = interaction as BaseCommandInteraction;
     await interaction.followUp({
       embeds: [
         {

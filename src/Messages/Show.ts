@@ -1,50 +1,34 @@
 import { Client, Message, MessageActionRow, MessageSelectMenu, MessageSelectMenuOptions, MessageSelectOptionData } from "discord.js";
 import fetch from "node-fetch";
-import Spotify from "../Plugins/Spotify";
-import JukeBox from "../Plugins/JukeBox";
-import Track from 'Types/Track';
-export const Show: any = {
+import Track from '../Types/Track';
+import JukeBox from '../Plugins/JukeBox';
+import { MessageInteraction } from '../Types/MessageInteraction';
+export const Show: MessageInteraction = {
     name: "show",
     description: "Shows 5 matches against requested query.",
-    type: "REPLY",
+    type: "MESSAGE",
     run: async (client: Client, message: Message) => {
         if (!message.guild || !message.member || !message.member.voice.channel) {
             return;
         }
         try {
             const query: string = message.content.trim();
-            const search = await fetch(
-                "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=" +
-                query +
-                "&type=video&key=" +
-                process.env.GOOGLE_API_KEY
-            );
-            const result: any = await search.json();
-
-
-
-            const selectOptions: MessageSelectOptionData[] = result.items.map((x: any) => {
+            const queue: Track[] = await JukeBox.getPlayerQueue(query, true);
+            const selectOptions: MessageSelectOptionData[] = queue.map((x: any) => {
                 return {
-                    label: x.snippet.title,
+                    label: x.youtubeTitle.substring(0, 100),
                     description: "Add to queue.",
-                    value: x.id.videoId
+                    value: x.name
                 };
             });
-
-
-
-
-
-
-            const row = new MessageActionRow()
+            const row: MessageActionRow = new MessageActionRow()
                 .addComponents(
                     new MessageSelectMenu()
-                        .setCustomId('select')
-                        .setPlaceholder('Please select a song.')
+                        .setCustomId('song')
+                        .setPlaceholder('Awaiting your selection...')
                         .addOptions(selectOptions),
                 );
-
-            await message.reply({ content: 'Please select a song', components: [row] });
+            await message.reply({ content: 'Select a song.', components: [row] });
 
         } catch (error: any) {
             console.log(error.message);

@@ -1,16 +1,19 @@
-import { entersState, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 import { BaseCommandInteraction, Client, GuildMember, Interaction, SelectMenuInteraction, VoiceBasedChannel } from "discord.js";
+import { CommandInteraction } from "../Types/CommandInteraction";
 import ChannelConfig from '../Types/ChannelConfig';
 
-import { Commands } from "../Commands";
+import { Commands } from "../handlers/Commands";
 import JukeBox from '../Plugins/JukeBox';
+import Track from '../Types/Track';
+import { Selects } from '../handlers/Selects';
 export default (client: Client): void => {
   client.on("interactionCreate", async (interaction: Interaction) => {
     if (interaction.isCommand() || interaction.isContextMenu()) {
       await handleSlashCommand(client, interaction);
     }
     if (interaction.isSelectMenu()) {
-      await handleMenuCommand(client, interaction);
+      await interaction.deferUpdate();
+      await handleSelectCommand(client, interaction);
     }
   });
 };
@@ -19,32 +22,26 @@ const handleSlashCommand = async (
   client: Client,
   interaction: BaseCommandInteraction
 ): Promise<void> => {
-  const slashCommand = Commands.find((c) => c.name === interaction.commandName);
+  const slashCommand: CommandInteraction | undefined = Commands.find((commandInteraction: CommandInteraction) => commandInteraction.name === interaction.commandName);
   if (!slashCommand) {
-    interaction.followUp({ content: "An error has occurred" });
+    interaction.followUp({ content: "Sorry, not doing that." });
     return;
   }
-
   await interaction.deferReply();
-
   slashCommand.run(client, interaction);
 };
 
-const handleMenuCommand = async (
+const handleSelectCommand = async (
   client: Client,
   interaction: SelectMenuInteraction
 ): Promise<void> => {
-  if (!interaction || !interaction.guild || !interaction.member || !(interaction.member as GuildMember).voice || !(interaction.member as GuildMember).voice.channel || !((interaction.member as GuildMember).voice.channel as VoiceBasedChannel).id) {
+
+  const selectOption: any | undefined = Selects.find((selectInteraction: any) => selectInteraction.name === interaction.customId);
+
+  if (!selectOption) {
     return;
   }
-  const value = interaction.values[0];
-  const channelConfig: ChannelConfig = {
-    guildId: interaction.guild.id,
-    channelId: ((interaction.member as GuildMember).voice.channel as VoiceBasedChannel).id,
-    adapterCreator: interaction.guild?.voiceAdapterCreator!
-  };
-  await JukeBox.addToPlayerQueue([], value);
-  if (JukeBox.channelInactive) {
-    JukeBox.enterChannel(channelConfig);
-  }
+
+  selectOption.run(client, interaction);
+
 };

@@ -1,10 +1,10 @@
 import { Client, Message } from "discord.js";
-import { Messages } from '../Messages';
+import { MessageInteraction } from '../Types/MessageInteraction';
+import { Messages } from '../handlers/Messages';
 
 export default (client: Client): void => {
   client.on("messageCreate", async (message: Message) => {
-    const command: string | undefined = process.env.NODE_ENV !== 'development' ? process.env.BOT_COMMAND : process.env.BOT_COMMAND_DEV;
-    if (!message.content.startsWith(command ? command : "-f")) {
+    if (!message.content.startsWith("-f")) {
       return;
     }
     await handleMessage(client, message);
@@ -19,27 +19,26 @@ const handleMessage = async (
     message.reply(":)");
     return;
   }
-
   const command = message.content.substring(3);
-  let actionRequest: string;
+  let interactionRequest: string;
   if (command.substring(0, 2) === "p ") {
-    actionRequest = "play";
+    interactionRequest = "play";
     message.content = command.substring(2);
   } else if (command.substring(0, 3) === "bnc") {
-    actionRequest = "bnc";
+    interactionRequest = "bnc";
   } else if (command.substring(0, 4) === "stop") {
-    actionRequest = "stop";
+    interactionRequest = "stop";
   } else if (command.substring(0, 4) === "skip") {
-    actionRequest = "skip";
+    interactionRequest = "skip";
   } else if (command.substring(0, 4) === "show") {
-    actionRequest = "show";
+    interactionRequest = "show";
     message.content = command.substring(5);
   }
 
-  const action = Messages.find((c) => c.name === actionRequest);
+  const action: MessageInteraction | undefined = Messages.find((messageInteraction: MessageInteraction) => messageInteraction.name === interactionRequest);
   if (!action) {
     message.reply("WTF?");
     return;
   }
-  await action.run(client, message);
+  action.run(client, message);
 };
