@@ -28,17 +28,22 @@ export const Help: CommandInteraction = {
               value: "Posts Steves latest stealth video.",
             },
             {
-              name: "-f radio",
-              value: "Joins channel and plays Triple J",
-            },
-            {
               name: "-f p ${query}",
               value: "Attempts to play the searched query. If player is active the queried result will be added to player queue.",
+            },
+            {
+              name: "-f show ${query}",
+              value: "returns a list of the searched query.",
+            },
+            {
+              name: "-f skip",
+              value: "Skips the current track.",
             },
             {
               name: "-f stop",
               value: "Deletes queue and Leaves channel.",
             },
+
           ],
         },
       ],
