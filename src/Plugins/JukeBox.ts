@@ -1,13 +1,11 @@
 import { AudioPlayer, createAudioPlayer, createAudioResource, entersState, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import fetch from "node-fetch";
-import stream from "youtube-audio-stream";
 import Track from '../Types/Track';
 import ChannelConfig from '../Types/ChannelConfig';
 import Spotify from "../Plugins/Spotify";
 var Queue = require("../db/schema/PlayQueue");
 
-import ytdl from 'ytdl-core';
-
+const play = require('play-dl');
 const Database = require("../db/index");
 
 interface IJukeBox {
@@ -38,7 +36,8 @@ class JukeBox implements IJukeBox {
                 const result = await search.json();
                 const videoId = result.items[0].id.videoId;
                 const url: string = "https://www.youtube.com/watch?v=" + videoId;
-                const resource = createAudioResource(stream(url) as any, {
+                let stream = await play.stream(url);
+                const resource = createAudioResource(stream.stream, {
                     metadata: {
                         id: nextSongInQueue._id.toString(),
                     },
@@ -102,6 +101,7 @@ class JukeBox implements IJukeBox {
                 const artists = track.artists.map((x: SpotifyApi.ArtistObjectSimplified) => x.name);
                 const searchQuery = artists.join(" ") + " " + track.name + (!track.album.includes(track.name) ? (" " + track.album) : "");
                 const song = {
+                    youtubeTitle: track.youtubeTitle,
                     searchQuery: searchQuery.trim(),
                 };
                 const doc = new Queue(song);
@@ -129,7 +129,10 @@ class JukeBox implements IJukeBox {
             const response = await search.json();
             const videoId = response.items[0].id.videoId;
             const url: string = "https://www.youtube.com/watch?v=" + videoId;
-            this.player.play(createAudioResource(ytdl("https://www.youtube.com/watch?v=5qap5aO4i9A", { quality: "highestaudio" }) as any, {
+            let stream = await play.stream(url);
+
+            this.player.play(createAudioResource(stream.stream, {
+                inputType: stream.type,
                 metadata: {
                     id: song._id.toString(),
                 },
@@ -203,7 +206,7 @@ class JukeBox implements IJukeBox {
                     const playlist = await spotify.getPlaylistTracks(
                         id
                     );
-                    const playlistTracks: SpotifyApi.PlaylistTrackObject[] = playlist.body.items;
+                    const playlistTracks: SpotifyApi.PlaylistTrackObject[] = shuffle(playlist.body.items);
 
                     queue.push(...playlistTracks.map((x: SpotifyApi.PlaylistTrackObject) => {
                         const artists = x.track.artists.map((x: SpotifyApi.ArtistObjectSimplified) => x.name);
@@ -263,3 +266,13 @@ function spotifyParser(str: string): string[] | false {
 
 
 
+
+function shuffle(array: SpotifyApi.PlaylistTrackObject[]): SpotifyApi.PlaylistTrackObject[] {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}

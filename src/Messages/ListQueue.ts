@@ -7,12 +7,6 @@ export const ListQueue: MessageInteraction = {
     description: "Lists player queue.",
     type: "MESSAGE",
     run: async (client: Client, message: Message) => {
-        // if (!message.guild || !message.member || !message.member.voice.channel) {
-
-        //     return;
-        // }
-
-        console.log("HERE");
         try {
             await Database.connect();
             const queue = await Queue.find({}).limit(10);
@@ -24,7 +18,7 @@ export const ListQueue: MessageInteraction = {
             }
 
             const queueResponse: string = queue.map((x: any, index: number) =>
-                (index + 1) + ". " + x.searchQuery + "\n"
+                (index + 1) + ". " + x.youtubeTitle + "\n"
             ).join("");
             message.reply(queueResponse);
         } catch (error: any) {

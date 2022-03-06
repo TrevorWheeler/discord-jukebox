@@ -5,7 +5,7 @@ import JukeBox from '../Plugins/JukeBox';
 import { MessageInteraction } from '../Types/MessageInteraction';
 export const Show: MessageInteraction = {
     name: "show",
-    description: "Shows 5 matches against requested query.",
+    description: "Shows matches against requested query.",
     type: "MESSAGE",
     run: async (client: Client, message: Message) => {
         if (!message.guild || !message.member || !message.member.voice.channel) {
@@ -15,15 +15,16 @@ export const Show: MessageInteraction = {
             const query: string = message.content.trim();
             const queue: Track[] = await JukeBox.getPlayerQueue(query, true);
 
-            const selectOptions: MessageSelectOptionData[] = queue.map((x: any) => {
+            let selectOptions: MessageSelectOptionData[] = queue.map((x: any) => {
                 return {
                     label: x.youtubeTitle.substring(0, 100),
                     description: "Add to queue.",
                     value: x.name
                 };
             });
-
-            console.log(selectOptions.length);
+            if (selectOptions.length > 25) {
+                selectOptions = selectOptions.slice(0, 25);
+            }
             const row: MessageActionRow = new MessageActionRow()
                 .addComponents(
                     new MessageSelectMenu()
@@ -38,5 +39,3 @@ export const Show: MessageInteraction = {
         }
     },
 };
-
-
