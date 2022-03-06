@@ -19,13 +19,13 @@ export const Bangers: MessageInteraction = {
       );
 
       const playlist: SpotifyApi.PlaylistTrackObject[] = spotifyPlaylist.body.items;
-      const queue: Track[] = playlist.map((x) => {
+      const queue: Track[] = shuffle(playlist.map((x) => {
         return {
           name: x.track.name,
           album: x.track.album.name,
           artists: x.track.artists
         };
-      });
+      }));
       await JukeBox.addToPlayerQueue(queue);
 
 
@@ -45,3 +45,14 @@ export const Bangers: MessageInteraction = {
     }
   },
 };
+
+
+function shuffle(array: Track[]): Track[] {
+  for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+  return array;
+}

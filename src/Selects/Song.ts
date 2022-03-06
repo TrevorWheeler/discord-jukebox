@@ -15,6 +15,7 @@ export const Song: any = {
     type: "SELECT",
     run: async (client: Client, interaction: SelectMenuInteraction) => {
         if (!interaction || !interaction.guild || !interaction.member || !(interaction.member as GuildMember).voice || !(interaction.member as GuildMember).voice.channel || !((interaction.member as GuildMember).voice.channel as VoiceBasedChannel).id) {
+            console.log("HIT");
             return;
         }
 

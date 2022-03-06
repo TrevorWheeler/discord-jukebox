@@ -14,6 +14,7 @@ export const Show: MessageInteraction = {
         try {
             const query: string = message.content.trim();
             const queue: Track[] = await JukeBox.getPlayerQueue(query, true);
+
             const selectOptions: MessageSelectOptionData[] = queue.map((x: any) => {
                 return {
                     label: x.youtubeTitle.substring(0, 100),
@@ -21,6 +22,8 @@ export const Show: MessageInteraction = {
                     value: x.name
                 };
             });
+
+            console.log(selectOptions.length);
             const row: MessageActionRow = new MessageActionRow()
                 .addComponents(
                     new MessageSelectMenu()

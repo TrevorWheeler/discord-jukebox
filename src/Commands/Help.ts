@@ -31,6 +31,10 @@ export const Help: CommandInteraction = {
               value: "Deletes queue and leaves channel.",
             },
             {
+              name: "-f q",
+              value: "Lists the next 10 songs in player queue.",
+            },
+            {
               name: "/roll",
               value: "Random roll between 0 - 100",
             },

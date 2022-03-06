@@ -6,6 +6,7 @@ import ChannelConfig from '../Types/ChannelConfig';
 import Spotify from "../Plugins/Spotify";
 var Queue = require("../db/schema/PlayQueue");
 
+import ytdl from 'ytdl-core';
 
 const Database = require("../db/index");
 
@@ -128,12 +129,13 @@ class JukeBox implements IJukeBox {
             const response = await search.json();
             const videoId = response.items[0].id.videoId;
             const url: string = "https://www.youtube.com/watch?v=" + videoId;
-            this.player.play(createAudioResource(stream(url) as any, {
+            this.player.play(createAudioResource(ytdl("https://www.youtube.com/watch?v=5qap5aO4i9A", { quality: "highestaudio" }) as any, {
                 metadata: {
                     id: song._id.toString(),
                 },
             }));
         } catch (error: any) {
+            this.play();
             console.error(error.message);
         }
     }

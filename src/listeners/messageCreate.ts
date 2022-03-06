@@ -21,7 +21,9 @@ const handleMessage = async (
   }
   const command = message.content.substring(3);
   let interactionRequest: string;
-  if (command.substring(0, 2) === "p ") {
+  if (command.substring(0, 1) === "q") {
+    interactionRequest = "listQueue";
+  } else if (command.substring(0, 2) === "p ") {
     interactionRequest = "play";
     message.content = command.substring(2);
   } else if (command.substring(0, 3) === "bnc") {
