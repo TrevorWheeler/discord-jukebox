@@ -1,6 +1,6 @@
 # Discord Jukebox
 
-Jukebox is a feature-rich Discord bot designed to enhance your server's music experience. users to collaboratively play and manage music from various sources, manage playlists, and enjoy additional fun commands.
+Jukebox is a feature-rich Discord bot designed to enhance a server's music experience. It allows users to collaboratively play and manage music from various sources, manage playlists, and enjoy additional fun commands. This is now mostly deprecated due to Spotify introducing "Spotify Sessions".
 
 ## Features
 
