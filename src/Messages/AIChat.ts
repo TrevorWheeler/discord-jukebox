@@ -54,8 +54,6 @@ export const AIChat: MessageInteraction = {
         }
       }
 
-      console.log("Full AI response:", fullContent);
-
       // Send the AI's response
       await message.reply(
         fullContent || "Sorry, I couldn't generate a response."

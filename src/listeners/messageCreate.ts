@@ -22,7 +22,7 @@ const handleMessage = async (
   const command = message.content.substring(3);
   let interactionRequest: string;
 
-  if (command.substring(0, 3) === "ai ") {
+  if (command.substring(0, 3).trim() === "ai") {
     interactionRequest = "aiChat";
     message.content = command.substring(3);
   } else {
