@@ -20,6 +20,10 @@ export const Help: Command = {
           },
           fields: [
             {
+              name: "-f ai ${query}",
+              value: "Ask AI a question",
+            },
+            {
               name: "-f p ${query}",
               value:
                 "Attempts to play the searched query. If player is active the queried result will be added to player queue.",

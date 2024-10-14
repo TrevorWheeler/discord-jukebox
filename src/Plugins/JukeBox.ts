@@ -8,6 +8,7 @@ import {
   joinVoiceChannel,
   JoinVoiceChannelOptions,
   NoSubscriberBehavior,
+  StreamType,
   VoiceConnection,
   VoiceConnectionStatus,
 } from "@discordjs/voice";
@@ -192,44 +193,28 @@ class JukeBox implements IJukeBox {
         this.destroyChannel();
         return;
       }
+      console.log("Search query:", song.searchQuery);
 
-      if (this.channel) {
-        await entersState(this.channel, VoiceConnectionStatus.Ready, 20_000);
-        console.log("Voice connection is ready");
-      } else {
-        console.log("No voice connection available");
-        return;
-      }
-
-      let yt_info = await playDL.search(song.searchQuery, {
-        limit: 1,
-      });
-
-      let stream = await playDL.stream(yt_info[0].url, {
+      let streamed = await playDL.stream(song.searchQuery, {
         discordPlayerCompatibility: true,
-        filter: "audio",
+        quality: 2, // This ensures we get a format Discord can understand
       });
-
-      console.log("Stream created:", stream);
 
       // Add this logging
-      stream.stream.on("data", (chunk: any) => {
+      streamed.stream.on("data", (chunk: any) => {
         console.log(`Received ${chunk.length} bytes of data.`);
       });
 
-      stream.stream.on("end", () => {
+      streamed.stream.on("end", () => {
         console.log("Stream ended");
       });
 
-      let resource = createAudioResource(stream.stream, {
-        inputType: stream.type,
-        metadata: {
-          id: song._id.toString(),
-        },
+      let resource = createAudioResource(streamed.stream, {
+        inputType: StreamType.Arbitrary, // Use Arbitrary instead of stream.type
         inlineVolume: true,
       });
 
-      console.log("Audio resource created:", resource);
+      console.log("Audio resource created");
 
       this.player.play(resource);
       console.log("Player.play() called");
