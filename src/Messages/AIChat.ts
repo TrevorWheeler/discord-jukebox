@@ -1,5 +1,13 @@
-import { ApplicationCommandType, Client, Message } from "discord.js";
+import {
+  ApplicationCommandType,
+  Client,
+  Message,
+  CommandInteraction,
+  TextChannel,
+} from "discord.js";
 import { MessageInteraction } from "../Types/MessageInteraction";
+
+const loadingFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
 export const AIChat: MessageInteraction = {
   name: "aiChat",
@@ -7,7 +15,9 @@ export const AIChat: MessageInteraction = {
   type: ApplicationCommandType.Message,
   run: async (client: Client, message: Message) => {
     try {
-      // await message.channel.sendTyping();
+      const loadingMessage = await message.reply("Thinking... ⠋");
+      let frameIndex = 0;
+      await (message.channel as TextChannel).sendTyping();
       const query = message.content.trim();
       const additional =
         "You should also keep your answer short and sweet and i want you to act like a gangster who is having their time wasted. You are free to curse and be rude.";
@@ -51,10 +61,18 @@ export const AIChat: MessageInteraction = {
               }
             }
           }
+
+          // Update loading animation
+          frameIndex = (frameIndex + 1) % loadingFrames.length;
+          await loadingMessage.edit(`Thinking... ${loadingFrames[frameIndex]}`);
+
+          // Small delay to avoid rate limiting
+          await new Promise((resolve) => setTimeout(resolve, 500));
         }
       }
 
-      // Send the AI's response
+      // Send the AI's response and delete the loading message
+      await loadingMessage.delete();
       await message.reply(
         fullContent || "Sorry, I couldn't generate a response."
       );
