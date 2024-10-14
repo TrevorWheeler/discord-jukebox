@@ -1,41 +1,73 @@
-import { Client, Message, MessageActionRow, MessageSelectMenu, MessageSelectMenuOptions, MessageSelectOptionData } from "discord.js";
-import fetch from "node-fetch";
-import Track from '../Types/Track';
-import JukeBox from '../Plugins/JukeBox';
-import { MessageInteraction } from '../Types/MessageInteraction';
+import {
+  ApplicationCommandType,
+  Client,
+  Message,
+  ActionRowBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  ButtonBuilder,
+} from "discord.js";
+import Track from "../Types/Track";
+import JukeBox from "../Plugins/JukeBox";
+import { MessageInteraction } from "../Types/MessageInteraction";
+
 export const Show: MessageInteraction = {
-    name: "show",
-    description: "Shows matches against requested query.",
-    type: "MESSAGE",
-    run: async (client: Client, message: Message) => {
-        if (!message.guild || !message.member || !message.member.voice.channel) {
-            return;
-        }
-        try {
-            const query: string = message.content.trim();
-            const queue: Track[] = await JukeBox.getPlayerQueue(query, true);
+  name: "show",
+  description: "Shows matches against requested query.",
+  type: ApplicationCommandType.Message,
+  run: async (client: Client, message: Message) => {
+    if (!message.guild || !message.member || !message.member.voice.channel) {
+      await message.reply(
+        "You need to be in a voice channel to use this command."
+      );
+      return;
+    }
 
-            let selectOptions: MessageSelectOptionData[] = queue.map((x: any) => {
-                return {
-                    label: x.youtubeTitle.substring(0, 100),
-                    description: "Add to queue.",
-                    value: x.name
-                };
-            });
-            if (selectOptions.length > 25) {
-                selectOptions = selectOptions.slice(0, 25);
-            }
-            const row: MessageActionRow = new MessageActionRow()
-                .addComponents(
-                    new MessageSelectMenu()
-                        .setCustomId('song')
-                        .setPlaceholder('Awaiting your selection...')
-                        .addOptions(selectOptions),
-                );
-            await message.reply({ content: 'Select a song.', components: [row] });
+    try {
+      const query: string = message.content
+        .split(" ")
+        .slice(1)
+        .join(" ")
+        .trim();
+      if (!query) {
+        await message.reply("Please provide a search query.");
+        return;
+      }
 
-        } catch (error: any) {
-            console.log(error.message);
-        }
-    },
+      const queue: Track[] = await JukeBox.getPlayerQueue(query, true);
+
+      if (queue.length === 0) {
+        await message.reply("No songs found matching your query.");
+        return;
+      }
+      const selectOptions: StringSelectMenuOptionBuilder[] = queue
+        .slice(0, 25)
+        .map(
+          (track: Track) =>
+            new StringSelectMenuOptionBuilder({
+              description: "Add to queue",
+              label: (track.youtubeTitle ?? track.name).substring(0, 100),
+              value: track.name,
+              emoji: "🎶",
+            })
+        );
+
+      const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+        new StringSelectMenuBuilder()
+          .setCustomId("song")
+          .setPlaceholder("Select a song to add to the queue")
+          .addOptions(selectOptions)
+      );
+
+      await message.reply({
+        content: "Select a song to add to the queue:",
+        components: [row],
+      });
+    } catch (error: any) {
+      console.error("Error in Show command:", error);
+      await message.reply(
+        "An error occurred while processing your request. Please try again later."
+      );
+    }
+  },
 };

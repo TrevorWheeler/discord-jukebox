@@ -21,6 +21,10 @@ class Database {
 
   async connect() {
     try {
+      console.log("Connecting to database...");
+      console.log(
+        `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:27017/${process.env.DB_NAME}`
+      );
       await mongoose.connect(
         `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:27017/${process.env.DB_NAME}`
       );

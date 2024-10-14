@@ -1,11 +1,16 @@
-import { BaseCommandInteraction, Client, Message } from "discord.js";
-import { CommandInteraction } from "../Types/CommandInteraction";
-export const Help: CommandInteraction = {
+import {
+  CommandInteraction,
+  Client,
+  Message,
+  ApplicationCommandType,
+} from "discord.js";
+import { Command } from "../Types/CommandInteraction";
+export const Help: Command = {
   name: "help",
   description: "Help for Filthy Bot",
-  type: "CHAT_INPUT",
-  run: async (client: Client, interaction: BaseCommandInteraction | Message) => {
-    interaction = interaction as BaseCommandInteraction;
+  type: ApplicationCommandType.ChatInput,
+  run: async (client: Client, interaction: CommandInteraction | Message) => {
+    interaction = interaction as CommandInteraction;
     await interaction.followUp({
       embeds: [
         {
@@ -16,7 +21,8 @@ export const Help: CommandInteraction = {
           fields: [
             {
               name: "-f p ${query}",
-              value: "Attempts to play the searched query. If player is active the queried result will be added to player queue.",
+              value:
+                "Attempts to play the searched query. If player is active the queried result will be added to player queue.",
             },
             {
               name: "-f show ${query}",
@@ -46,7 +52,6 @@ export const Help: CommandInteraction = {
               name: "/stevesLatest",
               value: "Posts Steves latest stealth video.",
             },
-
           ],
         },
       ],

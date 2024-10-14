@@ -1,13 +1,17 @@
+import {
+  CommandInteraction,
+  Client,
+  Message,
+  ApplicationCommandType,
+} from "discord.js";
+import { Command } from "../Types/CommandInteraction";
 
-import { BaseCommandInteraction, Client, Message } from "discord.js";
-import { CommandInteraction } from "../Types/CommandInteraction";
-
-export const Roll: CommandInteraction = {
+export const Roll: Command = {
   name: "roll",
   description: "Random roll between 0 - 100",
-  type: "CHAT_INPUT",
-  run: async (client: Client, interaction: BaseCommandInteraction | Message) => {
-    interaction = interaction as BaseCommandInteraction;
+  type: ApplicationCommandType.ChatInput,
+  run: async (client: Client, interaction: CommandInteraction | Message) => {
+    interaction = interaction as CommandInteraction;
     const content: string = Math.floor(
       Math.random() * (100 - 0 + 1) + 0
     ).toString();

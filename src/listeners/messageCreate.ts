@@ -1,6 +1,6 @@
 import { Client, Message } from "discord.js";
-import { MessageInteraction } from '../Types/MessageInteraction';
-import { Messages } from '../handlers/Messages';
+import { MessageInteraction } from "../Types/MessageInteraction";
+import { Messages } from "../handlers/Messages";
 
 export default (client: Client): void => {
   client.on("messageCreate", async (message: Message) => {
@@ -37,7 +37,10 @@ const handleMessage = async (
     message.content = command.substring(5);
   }
 
-  const action: MessageInteraction | undefined = Messages.find((messageInteraction: MessageInteraction) => messageInteraction.name === interactionRequest);
+  const action: MessageInteraction | undefined = Messages.find(
+    (messageInteraction: MessageInteraction) =>
+      messageInteraction.name === interactionRequest
+  );
   if (!action) {
     message.reply("WTF?");
     return;
